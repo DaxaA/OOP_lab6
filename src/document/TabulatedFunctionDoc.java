@@ -15,6 +15,7 @@ public class TabulatedFunctionDoc implements TabulatedFunction{
     private String file = "";
     private boolean modified = false;
     private boolean fileNameAssigned = false;
+    private FXMLMainFormController ctrl;
 
     public TabulatedFunction getTabFun() {
         return tabFun;
@@ -30,44 +31,21 @@ public class TabulatedFunctionDoc implements TabulatedFunction{
     public void tabulateFunction(Function function, double leftX, double rightX, int pointsCount) {
         tabFun = TabulatedFunctions.tabulate(function, leftX, rightX, pointsCount);
         modified = false;
+        CallRedraw();
     }
     public void saveFunctionAs(String fileName) {
         file = fileName;
         fileNameAssigned = true;
-        saveFunction();
-    }
-    public void loadFunction(String fileName) {
-        file = fileName;
-        fileNameAssigned = true;
-        try (FileReader reader = new FileReader(file + ".json")) {
-            JSONParser jsonParser = new JSONParser();
-            Object obj = jsonParser.parse(reader);
-            JSONArray jsonArray = (JSONArray) obj;
-            JSONObject point = (JSONObject) jsonArray.get(0);
-            FunctionPoint[] pM = new FunctionPoint[point.size()];
-            FunctionPoint poi = new FunctionPoint();
-            for (int i = 0; i < point.size(); i++) {
-                JSONArray pointValue = (JSONArray) point.get("p" + i);
-                poi.setX(Double.parseDouble(pointValue.get(0).toString()));
-                poi.setY(Double.parseDouble(pointValue.get(1).toString()));
-                pM[i] = new FunctionPoint(poi);
-            }
-            tabFun = new ArrayTabulatedFunction(pM);
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
-    }
-    public void saveFunction() {
         JSONObject pointJSON = new JSONObject();
         JSONArray pointArray = new JSONArray();
-        JSONArray funArray = new JSONArray();
+        JSONObject funArray = new JSONObject();
         for (int i = 0; i < getPointsCount(); i++) {
             pointArray.add(getPointX(i));
             pointArray.add(getPointY(i));
             pointJSON.put("p" + i, pointArray);
             pointArray = new JSONArray();
         }
-        funArray.add(pointJSON);
+        funArray.put("tabFun", pointJSON);
         try (FileWriter writer = new FileWriter(file + ".json")) {
             writer.write(funArray.toJSONString());
             writer.flush();
@@ -76,6 +54,26 @@ public class TabulatedFunctionDoc implements TabulatedFunction{
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    public void loadFunction(String fileName) {
+        file = fileName;
+        fileNameAssigned = true;
+        try (FileReader reader = new FileReader(file)) {
+            JSONParser jsonParser = new JSONParser();
+            Object obj = jsonParser.parse(reader);
+            JSONObject point = (JSONObject) obj;
+            FunctionPoint[] pM = new FunctionPoint[point.size()];
+            for (int i = 0; i < point.size(); i++) {
+                JSONArray pointValue = (JSONArray) point.get("p" + i);
+                pM[i] = new FunctionPoint((Double) pointValue.get(0), (Double) pointValue.get(1));
+            }
+            tabFun = new ArrayTabulatedFunction(pM);
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
+    public void saveFunction() {
+        if (fileNameAssigned) saveFunctionAs(file);
     }
 
     @Override
@@ -90,6 +88,7 @@ public class TabulatedFunctionDoc implements TabulatedFunction{
     public void setPoint(int index, FunctionPoint point) throws FunctionPointIndexOutOfBoundsException, InappropriateFunctionPointException {
         tabFun.setPoint(index, point);
         modified = true;
+        CallRedraw();
     }
     @Override
     public double getPointX(int index) throws FunctionPointIndexOutOfBoundsException {
@@ -99,6 +98,7 @@ public class TabulatedFunctionDoc implements TabulatedFunction{
     public void setPointX(int index, double x) throws FunctionPointIndexOutOfBoundsException, InappropriateFunctionPointException {
         tabFun.setPointX(index, x);
         modified = true;
+        CallRedraw();
     }
     @Override
     public double getPointY(int index) throws FunctionPointIndexOutOfBoundsException {
@@ -108,16 +108,23 @@ public class TabulatedFunctionDoc implements TabulatedFunction{
     public void setPointY(int index, double y) throws FunctionPointIndexOutOfBoundsException {
         tabFun.setPointY(index, y);
         modified = true;
+        CallRedraw();
     }
     @Override
     public void deletePoint(int index) throws FunctionPointIndexOutOfBoundsException, IllegalStateException {
         tabFun.deletePoint(index);
         modified = true;
+        CallRedraw();
     }
     @Override
-    public void addPoint(FunctionPoint point) throws InappropriateFunctionPointException {
-        tabFun.addPoint(point);
-        modified = true;
+    public void addPoint(FunctionPoint point) {
+        try {
+            tabFun.addPoint(point);
+            modified = true;
+            CallRedraw();
+        } catch (InappropriateFunctionPointException e) {
+            e.printStackTrace();
+        }
     }
     @Override
     public Object clone() throws CloneNotSupportedException {
@@ -164,5 +171,17 @@ public class TabulatedFunctionDoc implements TabulatedFunction{
     @Override
     public double getFunctionValue(double x) {
         return tabFun.getFunctionValue(x);
+    }
+
+    public void registerRedrawFunctionController(FXMLMainFormController fxmlMainFormController) {
+        ctrl = fxmlMainFormController;
+        CallRedraw();
+    }
+    public void CallRedraw() {
+        ctrl.redraw();
+    }
+
+    public boolean isModified() {
+        return modified;
     }
 }

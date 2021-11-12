@@ -10,10 +10,10 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="FXMLMainFormController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="document.FXMLMainFormController">
    <children>
       <Label fx:id="numOfPoint" layoutX="100.0" layoutY="57.0" prefHeight="23.0" prefWidth="80.0" text="Point 0 of n:" />
-      <TableView fx:id="table" layoutX="100.0" layoutY="80.0" prefHeight="200.0" prefWidth="400.0">
+      <TableView fx:id="table" layoutX="100.0" layoutY="80.0" onMouseClicked="#btNewClick3" onMouseReleased="#btNewClick3" prefHeight="200.0" prefWidth="400.0">
         <columns>
           <TableColumn prefWidth="200.0" text="X" fx:id="xColumn" />
           <TableColumn fx:id="yColumn" prefWidth="200.0" text="Y" />
@@ -23,18 +23,23 @@
       <TextField fx:id="edX" layoutX="215.0" layoutY="307.0" prefHeight="25.0" prefWidth="170.0" />
       <Label fx:id="pointX" layoutX="100.0" layoutY="311.0" text="New point X:" />
       <Label fx:id="pointY" layoutX="99.0" layoutY="344.0" prefHeight="20.0" prefWidth="70.0" text="New point Y:" />
-      <Button fx:id="addPoint" layoutX="414.0" layoutY="307.0" mnemonicParsing="false" onAction="#btNewClick1" prefHeight="25.0" prefWidth="85.0" text="Add point" />
-      <Button fx:id="deletePoint" layoutX="414.0" layoutY="341.0" mnemonicParsing="false" onAction="#btNewClick2" prefHeight="25.0" prefWidth="85.0" text="Delete point" />
+      <Button fx:id="addPointButton" layoutX="414.0" layoutY="307.0" mnemonicParsing="false" onAction="#btNewClick1" prefHeight="25.0" prefWidth="85.0" text="Add point" />
+      <Button fx:id="deleteButton" layoutX="414.0" layoutY="341.0" mnemonicParsing="false" onAction="#btNewClick2" prefHeight="25.0" prefWidth="85.0" text="Delete point" />
       <MenuBar layoutY="2.0">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem mnemonicParsing="false" text="Close" />
+                  <MenuItem fx:id="newFileMenuItem" mnemonicParsing="false" text="New" />
+              <MenuItem fx:id="saveFileMenuItem" mnemonicParsing="false" text="Save" />
+                  <MenuItem fx:id="saveFileAsNewItem" mnemonicParsing="false" text="Save As" />
+                  <MenuItem fx:id="openFileMenuItem" mnemonicParsing="false" text="Open" />
+                  <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" text="Exit" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
+          <Menu mnemonicParsing="false" text="Tabulate">
             <items>
-              <MenuItem mnemonicParsing="false" text="Delete" />
+              <MenuItem mnemonicParsing="false" text="Load" />
+                  <MenuItem mnemonicParsing="false" text="Tabulate" />
             </items>
           </Menu>
         </menus>

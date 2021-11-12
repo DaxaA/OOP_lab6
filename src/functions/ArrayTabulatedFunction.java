@@ -181,6 +181,9 @@ public class ArrayTabulatedFunction implements TabulatedFunction, Serializable {
 
     @Override
     public void addPoint(FunctionPoint point) throws InappropriateFunctionPointException {
+        if(point.getX() <= getLeftDomainBorder() || point.getX() >= getRightDomainBorder()){
+            throw new InappropriateFunctionPointException();
+        }
         int first = 0;
         int last = getPointsCount();
         int mid = first + (last - first) / 2;
