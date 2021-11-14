@@ -57,12 +57,9 @@ public class TabulatedFunctionDoc implements TabulatedFunction{
             JSONArray point = (JSONArray) obj;
             JSONObject poi = (JSONObject) point.get(0);
             FunctionPoint[] pM = new FunctionPoint[poi.size()];
-            FunctionPoint p = new FunctionPoint();
             for (int i = 0; i < poi.size(); i++) {
                 JSONArray pointValue = (JSONArray) poi.get("p" + i);
-                p.setX(Double.parseDouble(pointValue.get(0).toString()));
-                p.setY(Double.parseDouble(pointValue.get(1).toString()));
-                pM[i] = new FunctionPoint(p);
+                pM[i] = new FunctionPoint((double) pointValue.get(0), (double) pointValue.get(1));
             }
             tabFun = new ArrayTabulatedFunction(pM);
         } catch (IOException | ParseException e) {
