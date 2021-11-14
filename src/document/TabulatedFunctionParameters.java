@@ -1,10 +1,10 @@
 package document;
 
-class TabFParametres {
+class TabulatedFunctionParameters {
     public double leftBorderX, rightBorderX;
     public int pointCount;
 
-    TabFParametres(double leftBorderX, double rightBorderX, int pointCount) {
+    TabulatedFunctionParameters(double leftBorderX, double rightBorderX, int pointCount) {
         this.leftBorderX = leftBorderX;
         this.rightBorderX = rightBorderX;
         this.pointCount = pointCount;

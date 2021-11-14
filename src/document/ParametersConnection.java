@@ -10,20 +10,16 @@ import javafx.scene.control.DialogPane;
 
 import java.io.IOException;
 
-class FunParametresDialog extends Dialog<TabFParametres> {
+class ParametersConnection extends Dialog<TabulatedFunctionParameters> {
 
-    FunParametresDialog() {
+    ParametersConnection() {
         try {
-            FXMLLoader loader = Utility.createFxmlLoader(getClass(), "FXMLFunctionParametres");
+            FXMLLoader loader = Connect.createFxmlLoader(getClass(), "FXMLFunctionParameters");
             Parent root = loader.load();
-
             DialogPane dialogPane = getDialogPane();
-
             dialogPane.setContent(root);
             dialogPane.getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
-
-            FunctionParametresController controller = loader.getController();
-
+            FXMLParametersController controller = loader.getController();
             Button okButton = (Button) dialogPane.lookupButton(ButtonType.OK);
             okButton.setOnAction(event -> controller.okAction());
             okButton.addEventFilter(
@@ -34,14 +30,10 @@ class FunParametresDialog extends Dialog<TabFParametres> {
                         }
                     }
             );
-
             Button cancelButton = (Button) dialogPane.lookupButton(ButtonType.CANCEL);
             cancelButton.setOnAction(event -> controller.cancelAction());
-
             setResultConverter(buttonType -> controller.getParameters());
-
             setOnCloseRequest(event -> hide());
-
         } catch (IOException e) {
             e.printStackTrace();
         }

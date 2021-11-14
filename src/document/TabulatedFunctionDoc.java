@@ -17,13 +17,6 @@ public class TabulatedFunctionDoc implements TabulatedFunction{
     private boolean fileNameAssigned = false;
     private FXMLMainFormController ctrl;
 
-    public TabulatedFunction getTabFun() {
-        return tabFun;
-    }
-    public void setTabFun(TabulatedFunction tabFun) {
-        this.tabFun = tabFun;
-    }
-
     public void newFunction(double leftX, double rightX, int pointsCount) {
         tabFun = new ArrayTabulatedFunction(leftX, rightX, pointsCount);
         modified = false;
@@ -38,14 +31,14 @@ public class TabulatedFunctionDoc implements TabulatedFunction{
         fileNameAssigned = true;
         JSONObject pointJSON = new JSONObject();
         JSONArray pointArray = new JSONArray();
-        JSONObject funArray = new JSONObject();
+        JSONArray funArray = new JSONArray();
         for (int i = 0; i < getPointsCount(); i++) {
             pointArray.add(getPointX(i));
             pointArray.add(getPointY(i));
             pointJSON.put("p" + i, pointArray);
             pointArray = new JSONArray();
         }
-        funArray.put("tabFun", pointJSON);
+        funArray.add(pointJSON);
         try (FileWriter writer = new FileWriter(file + ".json")) {
             writer.write(funArray.toJSONString());
             writer.flush();
@@ -58,14 +51,18 @@ public class TabulatedFunctionDoc implements TabulatedFunction{
     public void loadFunction(String fileName) {
         file = fileName;
         fileNameAssigned = true;
-        try (FileReader reader = new FileReader(file)) {
+        try (FileReader reader = new FileReader(file + ".json")) {
             JSONParser jsonParser = new JSONParser();
             Object obj = jsonParser.parse(reader);
-            JSONObject point = (JSONObject) obj;
-            FunctionPoint[] pM = new FunctionPoint[point.size()];
-            for (int i = 0; i < point.size(); i++) {
-                JSONArray pointValue = (JSONArray) point.get("p" + i);
-                pM[i] = new FunctionPoint((Double) pointValue.get(0), (Double) pointValue.get(1));
+            JSONArray point = (JSONArray) obj;
+            JSONObject poi = (JSONObject) point.get(0);
+            FunctionPoint[] pM = new FunctionPoint[poi.size()];
+            FunctionPoint p = new FunctionPoint();
+            for (int i = 0; i < poi.size(); i++) {
+                JSONArray pointValue = (JSONArray) poi.get("p" + i);
+                p.setX(Double.parseDouble(pointValue.get(0).toString()));
+                p.setY(Double.parseDouble(pointValue.get(1).toString()));
+                pM[i] = new FunctionPoint(p);
             }
             tabFun = new ArrayTabulatedFunction(pM);
         } catch (IOException | ParseException e) {

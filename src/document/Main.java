@@ -14,8 +14,7 @@ public class Main extends Application {
         tabFDoc = new TabulatedFunctionDoc();
         tabFDoc.newFunction(0,10,5);
         tabFDoc.saveFunctionAs("tabFDoc");
-        //FXMLLoader loader = new FXMLLoader(getClass().getResource("/FXMLMainForm.fxml"));
-        FXMLLoader loader = Utility.createFxmlLoader(getClass(), "FXMLMainForm");
+        FXMLLoader loader = Connect.createFxmlLoader(getClass(), "FXMLMainForm");
         Parent root = loader.load();
         FXMLMainFormController ctrl = loader.getController();
         tabFDoc.registerRedrawFunctionController(ctrl);

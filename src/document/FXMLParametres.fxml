@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="190.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="document.FunctionParametresController">
+<AnchorPane prefHeight="190.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="document.FXMLParametersController">
     <TextField fx:id="leftDomainTextField" layoutX="137.0" layoutY="32.0" promptText="0" />
     <TextField fx:id="rightDomainTextField" layoutX="137.0" layoutY="76.0" promptText="0" />
     <Text fill="#000000" layoutX="19.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Left domain border" />

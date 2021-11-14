@@ -23,7 +23,7 @@
       <TextField fx:id="edX" layoutX="215.0" layoutY="307.0" prefHeight="25.0" prefWidth="170.0" />
       <Label fx:id="pointX" layoutX="100.0" layoutY="311.0" text="New point X:" />
       <Label fx:id="pointY" layoutX="99.0" layoutY="344.0" prefHeight="20.0" prefWidth="70.0" text="New point Y:" />
-      <Button fx:id="addPointButton" layoutX="414.0" layoutY="307.0" mnemonicParsing="false" onAction="#btNewClick1" prefHeight="25.0" prefWidth="85.0" text="Add point" />
+      <Button fx:id="adding" layoutX="414.0" layoutY="307.0" mnemonicParsing="false" onAction="#btNewClick1" prefHeight="25.0" prefWidth="85.0" text="Add point" />
       <Button fx:id="deleteButton" layoutX="414.0" layoutY="341.0" mnemonicParsing="false" onAction="#btNewClick2" prefHeight="25.0" prefWidth="85.0" text="Delete point" />
       <MenuBar layoutY="2.0">
         <menus>
@@ -36,12 +36,7 @@
                   <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" text="Exit" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Tabulate">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Load" />
-                  <MenuItem mnemonicParsing="false" text="Tabulate" />
-            </items>
-          </Menu>
+          <Menu fx:id="tabulateButton" mnemonicParsing="false" text="Tabulate" />
         </menus>
       </MenuBar>
    </children>

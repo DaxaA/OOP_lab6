@@ -1,19 +1,16 @@
 package document;
 
+import functions.Function;
 import functions.FunctionPoint;
-import functions.InappropriateFunctionPointException;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -49,20 +46,24 @@ public class FXMLMainFormController implements Initializable {
 
     @FXML
     private MenuItem saveFileAsNewItem;
+    @FXML
+    private Menu tabulateButton;
 
     @FXML
     private MenuItem saveFileMenuItem;
 
     @FXML
-    private Button addPointButton;
+    private Button adding;
 
-    private FunParametresDialog funParametresDialog;
+    private ParametersConnection parametersConnection;
     private FileChooser fileChooser;
+    private Loader loader;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        funParametresDialog = new FunParametresDialog();
+        parametersConnection = new ParametersConnection();
         fileChooser = new FileChooser();
+        loader = new Loader();
         xColumn.setCellValueFactory( new PropertyValueFactory<>("X"));
         yColumn.setCellValueFactory( new PropertyValueFactory<>("Y"));
         numOfPoint.setText("Point " + 0 + " of " + Main.tabFDoc.getPointsCount());
@@ -70,14 +71,14 @@ public class FXMLMainFormController implements Initializable {
     }
 
     @FXML
-    void btNewClick1(ActionEvent event) {
+    void btNewClick1() {
         Main.tabFDoc.addPoint(new FunctionPoint(Double.parseDouble(edX.getText()), Double.parseDouble(edY.getText())));
         edX.clear();
         edY.clear();
     }
 
     @FXML
-    void btNewClick2(ActionEvent event) {
+    void btNewClick2() {
         int index = table.getSelectionModel().getSelectedIndex();
         Main.tabFDoc.deletePoint(index);
     }
@@ -87,25 +88,30 @@ public class FXMLMainFormController implements Initializable {
         for (int i = 0; i < Main.tabFDoc.getPointsCount(); i++) {
             table.getItems().add(new FunctionPointT(Main.tabFDoc.getPointX(i), Main.tabFDoc.getPointY(i)));
         }
-        numOfPoint.setText("Point " + (table.getSelectionModel().getSelectedIndex()+1) + " of " + Main.tabFDoc.getPointsCount());
+        //numOfPoint.setText("Point " + (table.getSelectionModel().getSelectedIndex()+1) + " of " + Main.tabFDoc.getPointsCount());
+        btNewClick3();
     }
 
     @FXML
-    public void btNewClick3(MouseEvent event) {
+    public void btNewClick3() {
         numOfPoint.setText("Point " + (table.getSelectionModel().getSelectedIndex()+1) + " of " + Main.tabFDoc.getPointsCount());
     }
 
     private void initializeMenu() {
         newFileMenuItem.setOnAction( event -> {
             if (cancelBecauseNotSaved()) return;
-            Optional<TabFParametres> params = funParametresDialog.showAndWait();
-            params.ifPresent(tabFParametres -> {
-                Main.tabFDoc.newFunction(
-                        tabFParametres.leftBorderX,
-                        tabFParametres.rightBorderX,
-                        tabFParametres.pointCount
-                );
-                redraw();
+            Optional<TabulatedFunctionParameters> params = parametersConnection.showAndWait();
+            params.ifPresent(tabulatedFunctionParameters -> {
+                try {
+                    Main.tabFDoc.newFunction(
+                            tabulatedFunctionParameters.leftBorderX,
+                            tabulatedFunctionParameters.rightBorderX,
+                            tabulatedFunctionParameters.pointCount
+                    );
+                    redraw();
+                } catch (IllegalArgumentException e) {
+                    Error.errorProcession(e, "New function error");
+                }
             });
         });
         saveFileMenuItem.setOnAction(event -> Main.tabFDoc.saveFunction());
@@ -119,7 +125,31 @@ public class FXMLMainFormController implements Initializable {
             }
         });
         exitMenuItem.setOnAction(event -> getWindow().close());
+        tabulateButton.setOnAction(event -> {
+            if (cancelBecauseNotSaved()) return;
+            File selectedFile = fileChooser.showOpenDialog(getWindow());
+            if (selectedFile != null) {
+                try {
+                    Function function = loader.loadFunction(selectedFile);
+                    Optional<TabulatedFunctionParameters> parameters = parametersConnection.showAndWait();
+                    parameters.ifPresent(tabulatedFunctionParameters -> {
+                        try {
+                            Main.tabFDoc.tabulateFunction(
+                                    function, tabulatedFunctionParameters.leftBorderX,
+                                    tabulatedFunctionParameters.rightBorderX, tabulatedFunctionParameters.pointCount
+                            );
+                            redraw();
+                        } catch (IllegalArgumentException e) {
+                            Error.errorProcession(e, "Tabulate error");
+                        }
+                    });
+                } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException e) {
+                    Error.errorProcession(e, "Load error");
+                }
 
+            }
+        });
+        Connect.connection(tabulateButton);
     }
 
     private void saveFileAsAction() {
@@ -128,22 +158,18 @@ public class FXMLMainFormController implements Initializable {
     }
 
     private Stage getWindow() {
-        return (Stage) addPointButton.getScene().getWindow();
+        return (Stage) adding.getScene().getWindow();
     }
 
     private boolean cancelBecauseNotSaved() {
         if (Main.tabFDoc.isModified()) {
             Optional<ButtonType> result = new Alert(
-                    Alert.AlertType.CONFIRMATION,
-                    "У вас не сохранена функция, хотите ли сохранить?",
+                    Alert.AlertType.CONFIRMATION,"Save function?",
                     ButtonType.CANCEL, ButtonType.NO, ButtonType.YES
             ).showAndWait();
-
             if (result.isPresent()) {
                 ButtonType buttonType = result.get();
-
                 if (ButtonType.CANCEL == buttonType) return true;
-
                 if (ButtonType.YES == buttonType) {
                     Main.tabFDoc.saveFunction();
                 }
