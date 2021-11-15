@@ -14,7 +14,7 @@ class ParametersConnection extends Dialog<TabulatedFunctionParameters> {
 
     ParametersConnection() {
         try {
-            FXMLLoader loader = Connect.createFxmlLoader(getClass(), "FXMLFunctionParameters");
+            FXMLLoader loader = Connect.createFxmlLoader(getClass(), "FXMLParametres");
             Parent root = loader.load();
             DialogPane dialogPane = getDialogPane();
             dialogPane.setContent(root);
